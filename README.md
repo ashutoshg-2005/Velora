@@ -121,7 +121,7 @@
 ### 1. Clone and install
 
 ```bash
-git clone
+git clone https://github.com/ashutoshg-2005/Velora.git
 cd Velora
 npm install
 ```
