@@ -1,11 +1,12 @@
 "use client"
 
-import { useTransition } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { PlusIcon, WorkflowIcon } from "lucide-react"
 
 import { generateSlug } from "@/features/workflows/lib/generate-slug"
+import { WorkflowNameDialog } from "@/features/workflows/components/workflow-name-dialog"
 import {
   Popover,
   PopoverContent,
@@ -32,13 +33,7 @@ interface WorkflowNavProps {
 export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
   const { state } = useSidebar()
   const pathname = usePathname()
-  const [isPending, startTransition] = useTransition()
-
-  const handleCreateWorkflow = () => {
-    startTransition(async () => {
-      await onCreateWorkflow(generateSlug())
-    })
-  }
+  const [createOpen, setCreateOpen] = useState(false)
 
   const workflowItems = workflows.map((workflow) => (
     <SidebarMenuItem key={workflow.id}>
@@ -52,6 +47,19 @@ export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
       </SidebarMenuButton>
     </SidebarMenuItem>
   ))
+
+  // The naming dialog, shared by both sidebar states below.
+  const createDialog = (
+    <WorkflowNameDialog
+      open={createOpen}
+      onOpenChange={setCreateOpen}
+      title="New workflow"
+      submitLabel="Create"
+      // A generated name as the suggestion, so Enter alone still works.
+      defaultName={generateSlug()}
+      onSubmit={onCreateWorkflow}
+    />
+  )
 
   if (state === "collapsed") {
     return (
@@ -69,10 +77,7 @@ export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
                 <PopoverContent side="right" align="start" className="p-1">
                   <SidebarMenu>
                     <SidebarMenuItem>
-                      <SidebarMenuButton
-                        onClick={handleCreateWorkflow}
-                        disabled={isPending}
-                      >
+                      <SidebarMenuButton onClick={() => setCreateOpen(true)}>
                         <PlusIcon />
                         <span>New workflow</span>
                       </SidebarMenuButton>
@@ -85,6 +90,7 @@ export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroupContent>
+        {createDialog}
       </SidebarGroup>
     )
   }
@@ -94,8 +100,7 @@ export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
       <SidebarGroupLabel>Workflows</SidebarGroupLabel>
       <SidebarGroupAction
         title="New workflow"
-        onClick={handleCreateWorkflow}
-        disabled={isPending}
+        onClick={() => setCreateOpen(true)}
       >
         <PlusIcon />
         <span className="sr-only">New workflow</span>
@@ -103,6 +108,7 @@ export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
       <SidebarGroupContent>
         <SidebarMenu className="gap-y-0.5">{workflowItems}</SidebarMenu>
       </SidebarGroupContent>
+      {createDialog}
     </SidebarGroup>
   )
 }

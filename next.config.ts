@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
 }
 
 export default withSentryConfig(nextConfig, {
-  org: "enra-r3",
-  project: "browser-automation",
+  org: "e8b961d5f908",
+  project: "javascript-nextjs",
 
   // Source map upload auth token — set SENTRY_AUTH_TOKEN in CI / a gitignored env file
   authToken: process.env.SENTRY_AUTH_TOKEN,

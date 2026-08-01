@@ -3,7 +3,7 @@ import { esbuildPlugin } from "@trigger.dev/build/extensions";
 import sentryEsbuildPlugin from "@sentry/esbuild-plugin";
 
 export default defineConfig({
-  project: "proj_ntfnxpyhigpgyqvfkoso",
+  project: "proj_ahwvlswvmnujsxwxdvhg",
   runtime: "node",
   logLevel: "log",
   // The max compute seconds a task is allowed to run. If the task run exceeds this duration, it will be stopped.
@@ -25,8 +25,8 @@ export default defineConfig({
     extensions: [
       esbuildPlugin(
         sentryEsbuildPlugin({
-          org: "enra-r3",
-          project: "browser-automation",
+          org: "e8b961d5f908",
+          project: "javascript-nextjs",
           // Find this auth token in settings -> developer settings -> auth tokens
           authToken: process.env.SENTRY_AUTH_TOKEN,
         }),

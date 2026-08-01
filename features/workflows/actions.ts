@@ -9,7 +9,7 @@ import { redirect } from "next/navigation"
 import type { runWorkflowTask } from "@/features/workflows/tasks/run-workflow";
 
 import { liveblocks } from "@/lib/liveblocks"
-import { createWorkflow, deleteWorkflow, saveWorkflowGraph } from "@/features/workflows/data"
+import { createWorkflow, deleteWorkflow, renameWorkflow, saveWorkflowGraph } from "@/features/workflows/data"
 import { WorkflowGraph } from "@/lib/db/schema"
 
 export async function createWorkflowAction(name: string) {
@@ -19,14 +19,49 @@ export async function createWorkflowAction(name: string) {
     throw new Error("No active organization")
   }
 
+  const trimmed = name.trim()
+  if (!trimmed) {
+    throw new Error("Workflow name can't be empty")
+  }
+
   Sentry.getIsolationScope().setAttributes({ action: "createWorkflowAction", orgId })
 
-  const workflow = await createWorkflow(orgId, name)
+  const workflow = await createWorkflow(orgId, trimmed)
 
   Sentry.logger.info("Workflow created", { workflowId: workflow.id, orgId })
 
   revalidatePath("/workflows", "layout")
   redirect(`/workflows/${workflow.id}`)
+}
+
+export async function renameWorkflowAction(id: string, name: string) {
+  const { orgId } = await auth()
+
+  if (!orgId) {
+    throw new Error("No active organization")
+  }
+
+  const trimmed = name.trim()
+  if (!trimmed) {
+    throw new Error("Workflow name can't be empty")
+  }
+
+  Sentry.getIsolationScope().setAttributes({
+    action: "renameWorkflowAction",
+    orgId,
+    workflowId: id,
+  })
+
+  const workflow = await renameWorkflow(orgId, id, trimmed)
+
+  if (!workflow) {
+    Sentry.logger.warn("Workflow rename skipped — not found", { workflowId: id, orgId })
+    throw new Error("Workflow not found")
+  }
+
+  Sentry.logger.info("Workflow renamed", { workflowId: id, orgId })
+
+  revalidatePath("/workflows", "layout")
 }
 
 export async function deleteWorkflowAction(id: string) {
@@ -55,7 +90,7 @@ export async function deleteWorkflowAction(id: string) {
   Sentry.logger.info("Workflow deleted", { workflowId: id, orgId })
 
   revalidatePath("/workflows", "layout")
-  redirect("/")
+  redirect("/workflows")
 }
 
 export async function runWorkflowAction({
@@ -65,29 +100,17 @@ export async function runWorkflowAction({
   id: string
   graph: WorkflowGraph
 }) {
-  const { orgId, has } = await auth()
+  const { orgId } = await auth()
 
   if (!orgId) {
     throw new Error("No active organization")
   }
 
-  // The Agent node is Pro-only. Enforce it here rather than in the run task: the
-  // action holds the Clerk session (and has()), while the Trigger.dev task runs
-  // with no auth context. has() evaluates the active org, confirmed above.
   Sentry.getIsolationScope().setAttributes({
     action: "runWorkflowAction",
     orgId,
     workflowId: id,
   })
-
-  const hasAgentNode = graph.nodes.some((node) => node.data.type === "agent")
-  if (hasAgentNode && !has({ plan: "pro" })) {
-    Sentry.logger.warn("Workflow run denied — Agent node requires Pro plan", {
-      workflowId: id,
-      orgId,
-    })
-    throw new Error("The Agent node requires the Pro plan.")
-  }
 
   try {
     await saveWorkflowGraph({ orgId, id, graph })
@@ -110,7 +133,6 @@ export async function runWorkflowAction({
     orgId,
     runId: handle.id,
     nodeCount: graph.nodes.length,
-    hasAgentNode,
   })
 
   return handle
