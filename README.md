@@ -41,10 +41,10 @@
 <br />
 
 <p align="center">
-  <video src="./design/velora-brag.mp4" poster="./design/velora-brag.jpg" width="100%" controls autoplay muted loop playsinline></video>
+  <img src="./design/velora-brag.gif" alt="Velora in 20 seconds: draw a workflow together, run it in cloud browsers, replay every run" width="100%" />
 </p>
 
-<p align="center"><sub>20-second tour: draw it together, run it in cloud browsers, replay every run.</sub></p>
+<p align="center"><sub>20-second tour: draw it together, run it in cloud browsers, replay every run. <a href="./design/velora-brag.mp4">Watch with sound</a>.</sub></p>
 
 <br />
 
