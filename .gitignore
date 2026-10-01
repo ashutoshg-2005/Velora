@@ -39,3 +39,11 @@ next-env.d.ts
 .trigger
 
 .specs
+
+# claude code / ai agents
+/.claude/
+/.agents/
+/.mcp.json
+/skills-lock.json
+/CLAUDE.md
+/AGENTS.md
