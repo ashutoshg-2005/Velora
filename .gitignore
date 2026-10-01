@@ -47,3 +47,6 @@ next-env.d.ts
 /skills-lock.json
 /CLAUDE.md
 /AGENTS.md
+
+# brag video build output (the published copy lives in design/)
+/brag-output/

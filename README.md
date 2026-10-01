@@ -40,6 +40,14 @@
 
 <br />
 
+<p align="center">
+  <video src="./design/velora-brag.mp4" poster="./design/velora-brag.jpg" width="100%" controls autoplay muted loop playsinline></video>
+</p>
+
+<p align="center"><sub>20-second tour: draw it together, run it in cloud browsers, replay every run.</sub></p>
+
+<br />
+
 > Build automations as connected nodes, watch every step execute live, and inspect the complete browser session when the run is finished.
 
 ---
